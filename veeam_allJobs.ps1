@@ -36,6 +36,14 @@ $sensorPort = "PORT"
 $sensorKey ="KEY"
 #####  CONFIG END  #####
 
+# check if veeam powershell snapin is loaded. if not, load it
+if( (Get-PSSnapin -Name veeampssnapin -ErrorAction SilentlyContinue) -eq $nul){
+    Add-PSSnapin veeampssnapin
+}
+
+# if the script is run at the end of a job, the status is unknown. Therefore a delay is needed.
+sleep -Seconds 90
+
 $jobs = Get-VBRJob
 
 $jobsTable	= @()
