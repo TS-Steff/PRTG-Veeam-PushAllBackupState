@@ -49,7 +49,10 @@ $jobs = Get-VBRJob
 $jobsTable	= @()
 $i = 1;
 foreach($job in $jobs){
-
+    Write-Verbose $job.Name
+    Write-Verbose $job.FindLastSession().Result
+    write-Verbose $job.GetLastState()
+    
     switch($job.FindLastSession().Result){
         "Success" { $jobResultCode = 0 } # OK
         "Warning" { $jobResultCode = 1 } # Warning
@@ -57,6 +60,14 @@ foreach($job in $jobs){
         Default   { $jobResultcode = 9 } # Unknown
     }
 
+    if($jobResultCode -eq 9){
+        if($job.GetLastState() -eq "Working"){
+            $jobResultCode = 8
+        }
+    }
+    
+    Write-Verbose "========================"
+    
     $jobObject = [PSCustomObject]@{
         "ID"         = $i
         "Name"       = $job.Name
