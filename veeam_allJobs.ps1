@@ -63,6 +63,8 @@ foreach($job in $jobs){
     if($jobResultCode -eq 9){
         if($job.GetLastState() -eq "Working"){
             $jobResultCode = 8
+        }elseif($job.GetLastState() -eq "Stopping"){
+            $jobResultCode = 7
         }
     }
     
