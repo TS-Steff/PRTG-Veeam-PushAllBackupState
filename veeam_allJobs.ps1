@@ -36,13 +36,25 @@ $sensorPort = "PORT"
 $sensorKey ="KEY"
 #####  CONFIG END  #####
 
+#Make sure PSModulePath includes Veeam Console
+$MyModulePath = "C:\Program Files\Veeam\Backup and Replication\Console\"
+$env:PSModulePath = $env:PSModulePath + "$([System.IO.Path]::PathSeparator)$MyModulePath"
+if ($Modules = Get-Module -ListAvailable -Name Veeam.Backup.PowerShell){
+    try {
+        $Modules | Import-Module -WarningAction SilentlyContinue
+    }catch{
+        throw "Failed to load Veeam Modules"
+    }
+}
+
+
 # check if veeam powershell snapin is loaded. if not, load it
 if( (Get-PSSnapin -Name veeampssnapin -ErrorAction SilentlyContinue) -eq $nul){
-    Add-PSSnapin veeampssnapin
+    Add-PSSnapin veeampssnapin -ErrorAction SilentlyContinue
 }
 
 # if the script is run at the end of a job, the status is unknown. Therefore a delay is needed.
-sleep -Seconds 90
+#sleep -Seconds 90
 
 $jobs = Get-VBRJob
 
@@ -65,6 +77,8 @@ foreach($job in $jobs){
             $jobResultCode = 8
         }elseif($job.GetLastState() -eq "Stopping"){
             $jobResultCode = 7
+        }elseif($job.GetLastState() -eq "Postprocessing"){
+            $jobResultCode = 6
         }
     }
     
@@ -107,6 +121,7 @@ $prtgresult += @"
     <value>$jobResult</value>
     <showChart>1</showChart>
     <showTable>1</showTable>
+    <ValueLookup>ts.veeam.jobstatus.push</ValueLookup>
   </result>
 
 "@
