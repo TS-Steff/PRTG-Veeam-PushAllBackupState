@@ -31,7 +31,7 @@ param(
 )
 
 ##### COFNIG START #####
-$probeIP = "PROBE"
+$probeIP = "PROBE"      #include http:// or https://
 $sensorPort = "PORT"
 $sensorKey ="KEY"
 #####  CONFIG END  #####
@@ -146,13 +146,17 @@ function sendPush(){
     #$Answer = Invoke-WebRequest -Uri $NETXNUA -Method Post -Body $RequestBody -ContentType $ContentType -UseBasicParsing
     $answer = Invoke-WebRequest `
        -method POST `
-       -URI ("http://" + $probeIP + ":" + $sensorPort + "/" + $sensorKey) `
+       -URI ($probeIP + ":" + $sensorPort + "/" + $sensorKey) `
        -ContentType "text/xml" `
        -Body $prtgresult `
        -usebasicparsing
 
-       #-Body ("content="+[System.Web.HttpUtility]::UrlEncode.($prtgresult)) `
-    #http://prtg.ts-man.ch:5055/637D334C-DCD5-49E3-94CA-CE12ABB184C3?content=<prtg><result><channel>MyChannel</channel><value>10</value></result><text>this%20is%20a%20message</text></prtg>   
+    # Get Cert Thumbprint and expiration for debug
+    $servicePoint = [System.Net.ServicePointManager]::FindServicePoint($probeIP + ":" + $sensorPort)
+    write-verbose "CERT INFO"
+    write-verbose $servicePoint.Certificate.GetCertHashString()
+    write-verbose $servicePoint.Certificate.GetExpirationDateString()
+    
     if ($answer.statuscode -ne 200) {
        write-warning "Request to PRTG failed"
        write-host "answer: " $answer.statuscode
