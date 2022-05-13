@@ -6,7 +6,7 @@
     <SingleInt state="Error" value="2">Failed</SingleInt>
     <SingleInt state="Warning" value="6">Postprocessing</SingleInt>
     <SingleInt state="Warning" value="7">Stopping Job</SingleInt>    
-    <SingleInt state="Warning" value="8">Running Job</SingleInt>
+    <SingleInt state="OK" value="8">Running Job</SingleInt>
     <SingleInt state="Error" value="9">Unknown</SingleInt>
   </Lookups>
 </ValueLookup>
