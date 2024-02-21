@@ -62,13 +62,20 @@ $jobsTable	= @()
 $i = 1;
 foreach($job in $jobs){
     Write-Verbose $job.Name
-    Write-Verbose $job.FindLastSession().Result
+    Write-Verbose $job.ID
+    if(-not ([string]::IsNullOrEmpty($job.FindLastSession().Result))){
+        Write-Verbose $job.FindLastSession().Result
+    }else{
+        Write-Verbose "no Job result - job probably not once started"
+    }
     write-Verbose $job.GetLastState()
     
+
     switch($job.FindLastSession().Result){
         "Success" { $jobResultCode = 0 } # OK
         "Warning" { $jobResultCode = 1 } # Warning
         "Failed"  { $jobResultCode = 2 } # Error
+        $null     { $jobResultCode = 3 } # test
         Default   { $jobResultcode = 9 } # Unknown
     }
 
